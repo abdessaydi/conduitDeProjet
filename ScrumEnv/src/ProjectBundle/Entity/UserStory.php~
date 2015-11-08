@@ -8,11 +8,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class UserStory
 {
-      /**
-     * @ORM\GeneratedValue
+
+     /**
+     * @ORM\Column(type="string",length=255)
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     */    
+     * @Assert\NotBlank()
+     */        
     private $id;
     
     /**
@@ -48,23 +49,9 @@ class UserStory
     
 
     /**
-     * Set id
-     *
-     * @param string $id
-     *
-     * @return UserStory
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
      * Get id
      *
-     * @return string
+     * @return integer
      */
     public function getId()
     {
