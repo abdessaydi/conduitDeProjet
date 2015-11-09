@@ -23,7 +23,11 @@ class Task
      * @ORM\Column(type="string",length=255)
      * @Assert\NotBlank()
      */    
-    private $project;  
+    private $project; 
+    /**
+     * @ORM\Column(type="string",length=255)
+     */    
+    private $sprint;  
     /**
      * @ORM\Column(type="string",length=255)
      * @Assert\NotBlank()
@@ -34,21 +38,18 @@ class Task
      * @Assert\NotBlank()
      */    
     private $cost;  
-    /**
-     * @ORM\Column(type="string",length=255)
-     * @Assert\NotBlank()
-     */    
-    private $priority;  
 
-    
     /**
-     * @ORM\Column(type="string",length=255)
      * @Assert\NotBlank()
+     * @ORM\Column(type="string",length=255)
      */    
     private $achievement_task;
 
+     /**
+     * @ORM\Column(type="string",length=255)
+     */    
+    private $dependencies;
 
-    
     /**
      * Set id
      *
@@ -58,7 +59,7 @@ class Task
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->Id = $id;
 
         return $this;
     }
@@ -70,7 +71,7 @@ class Task
      */
     public function getId()
     {
-        return $this->id;
+        return $this->Id;
     }
 
     /**
@@ -122,6 +123,30 @@ class Task
     }
 
     /**
+     * Set sprint
+     *
+     * @param string $sprint
+     *
+     * @return Task
+     */
+    public function setSprint($sprint)
+    {
+        $this->sprint = $sprint;
+
+        return $this;
+    }
+
+    /**
+     * Get sprint
+     *
+     * @return string
+     */
+    public function getSprint()
+    {
+        return $this->sprint;
+    }
+
+    /**
      * Set description
      *
      * @param string $description
@@ -170,30 +195,6 @@ class Task
     }
 
     /**
-     * Set priority
-     *
-     * @param string $priority
-     *
-     * @return Task
-     */
-    public function setPriority($priority)
-    {
-        $this->priority = $priority;
-
-        return $this;
-    }
-
-    /**
-     * Get priority
-     *
-     * @return string
-     */
-    public function getPriority()
-    {
-        return $this->priority;
-    }
-
-    /**
      * Set achievementTask
      *
      * @param string $achievementTask
@@ -215,5 +216,29 @@ class Task
     public function getAchievementTask()
     {
         return $this->achievement_task;
+    }
+
+    /**
+     * Set dependencies
+     *
+     * @param string $dependencies
+     *
+     * @return Task
+     */
+    public function setDependencies($dependencies)
+    {
+        $this->dependencies = $dependencies;
+
+        return $this;
+    }
+
+    /**
+     * Get dependencies
+     *
+     * @return string
+     */
+    public function getDependencies()
+    {
+        return $this->dependencies;
     }
 }

@@ -5,6 +5,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use ProjectBundle\Entity\UserStory;
+use ProjectBundle\Entity\Task;
+use ProjectBundle\Entity\Sprint;
+use ProjectBundle\Entity\Project;
 use ProjectBundle\Form\UserStoryForm;
 
 class DefaultController extends Controller
@@ -50,13 +53,15 @@ class DefaultController extends Controller
         
     }
 
+
    public function Add_UsAction($owner, $project){
+
         $up ='';
         $message = '';
-
         $User_Story = new UserStory(); 
 
-        $form = $this->createFormBuilder($User_Story)
+         $form = $this->createFormBuilder($User_Story)
+            ->add('Id','text')
             ->add('description','text')
             ->add('priority','text')
             ->add('cost','text')
@@ -74,7 +79,7 @@ class DefaultController extends Controller
            
             if ($form->isValid()) 
             {
-                
+
                $em = $this->container->get('doctrine')->getEntityManager();
                $em->persist($User_Story);
                $em->flush();
@@ -124,6 +129,7 @@ class DefaultController extends Controller
          }
 
         $form = $this -> createFormBuilder($User_Story)
+            ->add('Id','text')
             ->add('description','text')
             ->add('priority','text')
             ->add('cost','text')
@@ -147,77 +153,121 @@ class DefaultController extends Controller
         'form' => $form->createView(), 'message' => $message, 'up' => $up));
     }
 
-     public function visualisationAction($owner, $project){
+      public function Add_TaskAction($owner, $project, $sprint){
+        $up ='';
+        $message = '';
+        $Task = new Task();
+
+        $form = $this->createFormBuilder($Task)
+            ->add('Id','text')
+            ->add('description','text')
+            ->add('cost','text')
+            ->add('dependencies','text')
+         ->getForm();
+
+         $Task -> setAchievementTask('ToDo');
+         $Task -> setOwner($owner);
+         $Task -> setProject($project);
+         $Task -> setSprint($sprint);
+         $request = $this->container->get('request');
+
+          if ($request->getMethod() == 'POST') 
+          {
+
+            $form->bind($request);
+            if ($form->isValid()) 
+            {
+               $em = $this->container->get('doctrine')->getEntityManager();
+               $em->persist($Task);
+               $em->flush();
+               $message='Tache ajouté avec succès !';
+           }
+        }
+
+        return $this->container->get('templating')->renderResponse('ProjectBundle:Sprint:Add_Task.html.twig',array(
+        'form' => $form->createView(), 'message' => $message,'up' => $up, 'owner' => $owner, 'project' => $project, 'sprint' => $sprint));
+    }
+ public function list_TaskAction($owner, $project, $sprint){
         $em = $this->container->get('doctrine')->getEntityManager();
 
-        $US= $em->getRepository('ProjectBundle:Task')->findBy(
+        $Task= $em->getRepository('ProjectBundle:Task')->findBy(
             array('owner' => $owner,
-                'project' => $project));
+                'project' => $project,
+                'sprint' => $sprint));
 
-        return $this->container->get('templating')->renderResponse('ProjectBundle:Kanban:Kanban_visualisation.html.twig', 
+        return $this->container->get('templating')->renderResponse('ProjectBundle:Sprint:TaskList.html.twig', 
         array(
-        'kanban_us' => $US,
-        'owner' => $owner,
-        'project' => $project
+        'message' => $Task, 'owner' => $owner, 'project' => $project, 'sprint' => $sprint
         ));
+        
     }
-
-    public function Update_task_achievementoGAction($owner, $project, $id){
+     public function Update_TaskAction($owner, $project, $sprint, $id){
 
          $message = '';
          $up = 'ok';
          $em = $this->container->get('doctrine')->getEntityManager();
-         $Task = $em->find('ProjectBundle:Task', $id);
-         $US= $em->getRepository('ProjectBundle:Task')->findAll();
-
+         $Task = $em->getRepository('ProjectBundle:Task')
+            ->findOneBy(
+            array('owner' => $owner,
+                'project' => $project,
+                'Id' => $id));
 
          if (!$Task){
-            $message = "Aucune tache trouve";
+            $message = "no US found";
          }
 
-         else{
-            $Task -> setAchievementTask("onGoing");
-            $em->persist($Task);
-            $em->flush();
+         $form = $this->createFormBuilder($Task)
+            ->add('Id','text')
+            ->add('description','text')
+            ->add('cost','text')
+            ->add('dependencies','text')
+         ->getForm();
+
+
+         $request = $this->container->get('request');
+
+        if ($request->getMethod() == 'POST') 
+        {
+            $form->bind($request);
+
+            if ($form->isValid()) 
+            {
+                $em->persist($Task);
+                $em->flush();
+                $message='Tache modifié avec succès !';
+            }
+            else{
+                $message = 'Form not valid';
+            }
          }
-          return $this->container->get('templating')->renderResponse('ProjectBundle:Kanban:Kanban_visualisation.html.twig',array('kanban_us' => $US, 'message' => $message, 'up' => $up,'owner' => $owner, 'project' => $project));
+
+          return $this->container->get('templating')->renderResponse('ProjectBundle:Sprint:Add_Task.html.twig',array(
+        'form' => $form->createView(), 'message' => $message, 'up' => $up, 'owner' => $owner, 'project' => $project, 'sprint' => $sprint));
     }
 
-    public function Update_task_achievementDAction($owner, $project, $id){
+     public function Delete_TaskAction($owner, $project,$sprint, $id)
+    {
+        $em = $this->container->get('doctrine')->getEntityManager();
+        $User_Story = $em->getRepository('ProjectBundle:Task')
+            ->findOneBy(
+            array('owner' => $owner,
+                'project' => $project,
+                'sprint' => $sprint,
+                'Id' => $id));
+            
+        if (!$User_Story) 
+        {
+           throw new NotFoundHttpException("User_Story not found");
+        }
+            
+        $em->remove($User_Story);
+        $em->flush();        
 
-         $message = '';
-         $up = 'ok';
-         $em = $this->container->get('doctrine')->getEntityManager();
-         $Task = $em->find('ProjectBundle:Task', $id);
-          $US= $em->getRepository('ProjectBundle:Task')->findAll();
-         if (!$Task){
-            $message = "Aucune tache trouve";
-         }
 
-         else{
-            $Task -> setAchievementTask("Done");
-            $em->persist($Task);
-            $em->flush();
-         }
-          return $this->container->get('templating')->renderResponse('ProjectBundle:Kanban:Kanban_visualisation.html.twig',array('kanban_us' => $US, 'message' => $message, 'up' => $up,'owner' => $owner, 'project' => $project));
+      return new RedirectResponse($this->container->get('router')->generate('go_to_task_list', array('owner' => $owner, 'project' => $project, 'sprint' => $sprint)));
     }
 
-    public function Update_task_achievementToDoAction($owner, $project, $id){
 
-         $message = '';
-         $up = 'ok';
-         $em = $this->container->get('doctrine')->getEntityManager();
-         $Task = $em->find('ProjectBundle:Task', $id);
-          $US= $em->getRepository('ProjectBundle:Task')->findAll();
-         if (!$Task){
-            $message = "Aucune tache trouve";
-         }
 
-         else{
-            $Task -> setAchievementTask("ToDo");
-            $em->persist($Task);
-            $em->flush();
-         }
-          return $this->container->get('templating')->renderResponse('ProjectBundle:Kanban:Kanban_visualisation.html.twig',array('kanban_us' => $US, 'message' => $message, 'up' => $up,'owner' => $owner, 'project' => $project));
-    }
+     
 }
