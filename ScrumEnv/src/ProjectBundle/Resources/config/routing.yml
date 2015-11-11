@@ -20,22 +20,52 @@ Project:
     pattern: /Project/{owner}/{project}
     defaults: { _controller: ProjectBundle:Default:ProjectOverview }
     
+
+    
 Sprint_creation:
     pattern: /Sprint/new/{owner}/{project}
     defaults: { _controller: ProjectBundle:Sprint:SprintCreation }
+    
+Sprint_task_list:
+    pattern: /Sprint/list/{owner}/{project}/{sprintId}/{kanban_view}
+    defaults: { _controller: ProjectBundle:Sprint:SprintList }
+Sprint_task_delete:
+    pattern: /Sprint/list/{owner}/{project}/{sprintId}/{taskId}
+    defaults: { _controller: ProjectBundle:Sprint:SprintListDeleteTask }
+
+
 
 go_to_Kanban:
-  pattern: /Kanban/{owner}/{project}/visualisation/
-  defaults: { _controller: ProjectBundle:Default:visualisation } 
+  pattern: /Kanban/{owner}/{project}/{sprint}/visualisation/
+  defaults: { _controller: ProjectBundle:Kanban:visualisation } 
 
 oG_Update_Achievement:
-  pattern: /Kanban/{owner}/{project}/Update_task_achievement_OG/{id}
-  defaults: { _controller: ProjectBundle:Default:Update_task_achievementoG }
+  pattern: /Kanban/{owner}/{project}/{sprint}/Update_task_achievement_OG/{id}
+  defaults: { _controller: ProjectBundle:Kanban:Update_task_achievementoG }
 
 Done_Update_Achievement:
-  pattern: /Kanban/{owner}/{project}/Update_task_achievement_Done/{id}
-  defaults: { _controller: ProjectBundle:Default:Update_task_achievementD }
+  pattern: /Kanban/{owner}/{project}/{sprint}/Update_task_achievement_Done/{id}
+  defaults: { _controller: ProjectBundle:Kanban:Update_task_achievementD }
 
 ToDo_Update_Achievement:
-  pattern: /Kanban/{owner}/{project}/Update_task_achievement_ToDo/{id}
-  defaults: { _controller: ProjectBundle:Default:Update_task_achievementToDo }
+  pattern: /Kanban/{owner}/{project}/{sprint}/Update_task_achievement_ToDo/{id}
+  defaults: { _controller: ProjectBundle:Kanban:Update_task_achievementToDo }
+
+
+
+go_to_task:
+  pattern: /Task/Add_Task/{owner}/{project}/{sprint}
+  defaults: { _controller: ProjectBundle:Default:Add_Task }  
+
+go_to_task_list:
+  pattern: /Task/{owner}/{project}/{sprint}
+  defaults: { _controller: ProjectBundle:Default:list_Task }    
+
+Update_Task:
+  pattern: /Task/update_Task/{owner}/{project}/{sprint}/{id}
+  defaults: { _controller: ProjectBundle:Default:Update_Task } 
+
+Delete_Task:
+  pattern: /Task/deleteTask/{owner}/{project}/{sprint}/{id}
+  defaults: { _controller: ProjectBundle:Default:Delete_Task } 
+
